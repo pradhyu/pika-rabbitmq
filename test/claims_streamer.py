@@ -36,6 +36,23 @@ channel.basic_publish(
 
 connection.sleep(5)
 
+# Get ten messages and break out
+print("Consuming 1 messages from queue khai")
+for method_frame, properties, body in channel.consume('khai'):
+    # Display the message parts
+    print(method_frame)
+    print(properties)
+    print(body)
+    # Acknowledge the message
+    channel.basic_ack(method_frame.delivery_tag)
+    # Escape out of the loop after 1 messages
+    if method_frame.delivery_tag == 1:
+        break
+# Cancel the consumer and return any pending messages
+requeued_messages = channel.cancel()
+print('Requeued %i messages' % requeued_messages)
+
+
 print("Sending text message to group")
 channel.basic_publish(
     'test_exchange', 'group_key', 'Message to group_key',
