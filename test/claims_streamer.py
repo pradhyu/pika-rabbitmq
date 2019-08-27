@@ -10,7 +10,6 @@ from pika.adapters.blocking_connection import BlockingChannel, BlockingConnectio
 
 logging.basicConfig(level=logging.ERROR)
 
-
 credentials: PlainCredentials = pika.PlainCredentials('guest', 'guest')
 parameters: ConnectionParameters = pika.ConnectionParameters('localhost', credentials=credentials, port=5672)
 connection: BlockingConnection = pika.BlockingConnection(parameters)
@@ -27,31 +26,32 @@ with open('../tests/test_01.json') as f:
     payload = json.load(f)
     f.close()
 
+num_of_trials = 5
 print("Sending json message to a queue")
-channel.basic_publish(
-    exchange='test_exchange',
-    routing_key='standard_key',
-    body=json.dumps(payload), # need to dump the payload as body
-    properties=pika.BasicProperties(content_type='application/json', delivery_mode=1))
+for i in range(num_of_trials):
+    channel.basic_publish(
+        exchange='test_exchange',
+        routing_key='standard_key',
+        body=json.dumps(payload),  # need to dump the payload as body
+        properties=pika.BasicProperties(content_type='application/json', delivery_mode=1))
 
 connection.sleep(5)
 
 # Get ten messages and break out
-print("Consuming 1 messages from queue khai")
+print(f'Consuming last {num_of_trials} messages from queue khai')
 for method_frame, properties, body in channel.consume('khai'):
     # Display the message parts
     print(method_frame)
     print(properties)
-    print(body)
+    print(json.loads(body))
     # Acknowledge the message
     channel.basic_ack(method_frame.delivery_tag)
-    # Escape out of the loop after 1 messages
-    if method_frame.delivery_tag == 1:
+    # Escape out of the loop after num_of_trials messages
+    if method_frame.delivery_tag == num_of_trials:
         break
 # Cancel the consumer and return any pending messages
-requeued_messages = channel.cancel()
-print('Requeued %i messages' % requeued_messages)
-
+requeued_messages: int = channel.cancel()
+print('Requeued %i messages=' % requeued_messages)
 
 print("Sending text message to group")
 channel.basic_publish(
