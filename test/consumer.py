@@ -9,7 +9,6 @@ print("test started")
     ("6*9", 4),
 ])
 def test_eval(input, expected):
-    print("testing eval")
     assert eval(input) == expected
 
 
