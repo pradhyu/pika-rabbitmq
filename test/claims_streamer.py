@@ -43,7 +43,7 @@ for method_frame, properties, body in channel.consume('khai'):
     # Display the message parts
     print(method_frame)
     print(properties)
-    print(json.loads(body))
+    print(body)
     # Acknowledge the message
     channel.basic_ack(method_frame.delivery_tag)
     # Escape out of the loop after num_of_trials messages
@@ -64,5 +64,7 @@ print("Sending text message")
 channel.basic_publish(
     'test_exchange', 'standard_key', 'Message to standard_key',
     pika.BasicProperties(content_type='text/plain', delivery_mode=1))
+
+
 
 connection.close()
