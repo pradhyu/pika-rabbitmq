@@ -1,2 +1,10 @@
-{"json":  "json",
- "vector": ["vectors", "vectors2"]}
+{
+    "json": "json",
+    "object": {
+        "object": {
+            "object1": "object",
+            "object2": "object2"
+        }
+    },
+    "vector": ["vectors", "vectors2"]
+}
